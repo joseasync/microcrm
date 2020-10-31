@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.forms import inlineformset_factory #multiple forms
+from django.forms import inlineformset_factory  # multiple forms
 from .models import *
 from .forms import OrderForm
 from .filters import OrderFilter
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 # Create your views here.
@@ -32,6 +33,18 @@ def customer(request, customerPk):
 
     myFilter = OrderFilter(request.GET, queryset=orders)
     orders = myFilter.qs
+
+    paginator = Paginator(orders, 5)
+    page = request.GET.get('page')
+
+    try:
+        orders = paginator.page(page)
+    except PageNotAnInteger:
+        orders = paginator.page(1)
+    except EmptyPage:
+        orders = paginator.page(paginator.num_pages)
+
+
     context = {'customer': customer, 'orders': orders, 'myFilter': myFilter}
     return render(request, 'accounts/customer.html', context)
 
@@ -45,7 +58,7 @@ def createOrder(request, pk):
 
     if request.method == 'POST':
         # form = OrderForm(request.POST)
-        formset = OrderFormSet(request.POST ,instance=customer)
+        formset = OrderFormSet(request.POST, instance=customer)
         if formset.is_valid():
             formset.save()
             return redirect('/')
