@@ -48,4 +48,4 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     customer = models.ForeignKey(Customer, null=False, default=None, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, null=False, default=None, on_delete=models.PROTECT)
-
+    note = models.CharField(max_length=2002, null=True)
